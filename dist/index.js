@@ -40,10 +40,13 @@ const fs_1 = __nccwpck_require__(147);
 const util_1 = __nccwpck_require__(837);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        const GITHUB_ENV = Object.entries(process.env).sort((a, b) => a[0].localeCompare(b[0]));
-        core.debug(`Github ENV: ${(0, util_1.inspect)(GITHUB_ENV)}`);
+        const GITHUB_ENV = Object.entries(process.env)
+            .sort((a, b) => a[0].localeCompare(b[0]))
+            .filter(([key]) => key.startsWith('GITHUB'))
+            .map(([key, value]) => `${key}: ${value}`);
+        core.debug(`💥Github ENV VARIABLE: ${(0, util_1.inspect)(GITHUB_ENV)}`);
         const EVENT_STR = (0, fs_1.readFileSync)(process.env['GITHUB_EVENT_PATH'], 'utf8');
-        core.debug(`Github EVENT: ${(0, util_1.inspect)(JSON.parse(EVENT_STR))}`);
+        core.debug(`💥Github EVENT: ${(0, util_1.inspect)(JSON.parse(EVENT_STR))}`);
     });
 }
 run();

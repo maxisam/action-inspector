@@ -3,9 +3,10 @@ import {readFileSync} from 'fs';
 import {inspect} from 'util';
 
 async function run(): Promise<void> {
+  const githubEnvOnly = core.getInput('githubEnvOnly');
   const GITHUB_ENV = Object.entries(process.env)
     .sort((a, b) => a[0].localeCompare(b[0]))
-    .filter(([key]) => key.startsWith('GITHUB'))
+    .filter(([key]) => githubEnvOnly !== 'true' || key.startsWith('GITHUB'))
     .map(([key, value]) => `${key}: ${value}`);
   core.debug(`💥Github ENV VARIABLE: ${inspect(GITHUB_ENV)}`);
   const EVENT_STR = readFileSync(process.env['GITHUB_EVENT_PATH'] as string, 'utf8');

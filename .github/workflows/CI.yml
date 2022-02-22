@@ -52,4 +52,9 @@ jobs:
     needs: [build]
     steps:
       - uses: actions/checkout@v2
-      - uses: ./
+      - name: print Github env variable only
+        uses: ./
+      - name: print all env variable
+        uses: ./
+        with: 
+          githubEnvOnly: 'false'

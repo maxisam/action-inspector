@@ -1,36 +1,12 @@
 import * as core from '@actions/core';
+import {readFileSync} from 'fs';
 import {inspect} from 'util';
-import {getInputs, getOctokit, getOwnerRepo} from './common';
-import {createActionRequest, DispatchEventRequest} from './create-action-request';
 
 async function run(): Promise<void> {
-  const inputs = getInputs();
-  const [owner, repo] = getOwnerRepo(inputs.owner, inputs.repository);
-  const octokit = getOctokit(inputs.authToken, 'github-action');
-  let request: DispatchEventRequest;
-
-  try {
-    request = createActionRequest(owner, repo);
-    core.debug(`dispatch event request: ${inspect(request)}`);
-  } catch (error) {
-    if (error instanceof Error) {
-      core.setFailed(`Error creating status request object: ${error.message}`);
-    }
-    return;
-  }
-
-  if (octokit === null) {
-    core.setFailed('Error creating octokit:\noctokit was null');
-  } else {
-    try {
-      await octokit.rest.repos.getViews(request);
-    } catch (error) {
-      core.debug(inspect(error));
-      if (error instanceof Error) {
-        core.setFailed(`Error setting status:\n${error.message}\nRequest object:\n${JSON.stringify(request, null, 2)}`);
-      }
-    }
-  }
+  const GITHUB_ENV = Object.entries(process.env).sort((a, b) => a[0].localeCompare(b[0]));
+  core.debug(`Github ENV: ${inspect(GITHUB_ENV)}`);
+  const EVENT_STR = readFileSync(process.env['GITHUB_EVENT_PATH'] as string, 'utf8');
+  core.debug(`Github EVENT: ${inspect(JSON.parse(EVENT_STR))}`);
 }
 
 run();
